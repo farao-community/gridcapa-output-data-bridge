@@ -64,4 +64,7 @@ public class FileTransferFlow {
         return filename.matches(fileNamePattern);
     }
 
+    public String getFileNameRegex() {
+        return fileNameRegex;
+    }
 }
