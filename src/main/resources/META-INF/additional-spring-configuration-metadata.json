@@ -1,0 +1,99 @@
+{
+  "properties": [
+    {
+      "name": "data-bridge.file-regex",
+      "type": "java.lang.String",
+      "description": "File name regex."
+    },
+    {
+      "name": "data-bridge.sources.minio.url",
+      "type": "java.lang.String",
+      "description": "MinIO URL."
+    },
+    {
+      "name": "data-bridge.sources.minio.access-key",
+      "type": "java.lang.String",
+      "description": "MinIO access key."
+    },
+    {
+      "name": "data-bridge.sources.minio.secret-key",
+      "type": "java.lang.String",
+      "description": "MinIO secret key."
+    },
+    {
+      "name": "data-bridge.sources.minio.bucket",
+      "type": "java.lang.String",
+      "description": "MinIO bucket."
+    },
+    {
+      "name": "data-bridge.sources.minio.base-directory",
+      "type": "java.lang.String",
+      "description": "MinIO base directory."
+    },
+    {
+      "name": "data-bridge.sources.minio.polling-delay-in-ms",
+      "type": "java.lang.String",
+      "description": "MinIO polling delay in ms."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.active",
+      "type": "java.lang.String",
+      "description": "Sink FTP active."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.host",
+      "type": "java.lang.String",
+      "description": "FTP host."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.port",
+      "type": "java.lang.String",
+      "description": "FTP port."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.username",
+      "type": "java.lang.String",
+      "description": "FTP username."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.password",
+      "type": "java.lang.String",
+      "description": "FTP password."
+    },
+    {
+      "name": "data-bridge.sinks.ftp.base-directory",
+      "type": "java.lang.String",
+      "description": "FTP base directory."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.active",
+      "type": "java.lang.String",
+      "description": "Sink SFTP active."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.host",
+      "type": "java.lang.String",
+      "description": "SFTP host."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.port",
+      "type": "java.lang.String",
+      "description": "SFTP port."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.username",
+      "type": "java.lang.String",
+      "description": "SFTP username."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.password",
+      "type": "java.lang.String",
+      "description": "SFTP password."
+    },
+    {
+      "name": "data-bridge.sinks.sftp.base-directory",
+      "type": "java.lang.String",
+      "description": "SFTP base directory."
+    }
+
+  ] }
