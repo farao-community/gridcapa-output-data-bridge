@@ -8,9 +8,11 @@ package com.farao_community.farao.gridcapa.output_data_bridge;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ import static com.farao_community.farao.gridcapa.output_data_bridge.sinks.SftpSi
  */
 @Component
 public class FileTransferFlow {
+    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
     @Value("${data-bridge.file-regex}")
     private String fileNameRegex;
@@ -52,6 +55,7 @@ public class FileTransferFlow {
     IntegrationFlow generateFileTransferFlow(String fromChannel, String toChannel, String fileNamePattern) {
         return IntegrationFlows.from(fromChannel)
                 .filter(Message.class, message -> fileNameMatches(message, fileNamePattern))
+                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"File \" + headers.file_name + \" matches expected pattern, transferred to FTP\""))
                 .channel(toChannel)
                 .get();
     }
