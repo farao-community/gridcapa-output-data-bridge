@@ -18,6 +18,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.annotation.BridgeFrom;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
@@ -29,6 +30,7 @@ import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.integration.transformer.StreamTransformer;
 import org.springframework.messaging.Message;
@@ -47,6 +49,8 @@ public class MinioSource {
     public static final String FROM_MINIO_CHANNEL = "fromMinioChannel";
     public static final String FILE_NAME_HEADER = "gridcapa_file_name";
     public static final String MINIO_CHANNEL = "minioChannel";
+
+    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
     @Value("${data-bridge.sources.minio.url}")
     private String url;
@@ -98,6 +102,7 @@ public class MinioSource {
         return IntegrationFlows.from("fromMinioDirectChannel")
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
+                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers.file_name"))
                 .channel(FROM_MINIO_CHANNEL)
                 .get();
     }
