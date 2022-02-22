@@ -55,7 +55,7 @@ public class FileTransferFlow {
     IntegrationFlow generateFileTransferFlow(String fromChannel, String toChannel, String fileNamePattern) {
         return IntegrationFlows.from(fromChannel)
                 .filter(Message.class, message -> fileNameMatches(message, fileNamePattern))
-                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"File \" + headers.file_name + \" matches expected pattern, transferred to FTP\""))
+                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"File \" + headers." + FILE_NAME_HEADER + " + \" matches expected pattern, transferred to FTP\""))
                 .channel(toChannel)
                 .get();
     }

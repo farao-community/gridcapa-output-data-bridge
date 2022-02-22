@@ -102,7 +102,7 @@ public class MinioSource {
         return IntegrationFlows.from("fromMinioDirectChannel")
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
-                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers.file_name"))
+                .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
                 .channel(FROM_MINIO_CHANNEL)
                 .get();
     }
