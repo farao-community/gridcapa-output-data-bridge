@@ -16,8 +16,9 @@ on:
         default: "false"
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -50,7 +51,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build and publish Docker image
-        if: github.ref == 'refs/heads/master'
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: farao/gridcapa-output-data-bridge
