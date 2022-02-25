@@ -6,12 +6,15 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge.sinks;
 
+import com.jcraft.jsch.ChannelSftp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.file.remote.session.CachingSessionFactory;
+import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.outbound.SftpMessageHandler;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.messaging.MessageHandler;
@@ -26,6 +29,7 @@ import static com.farao_community.farao.gridcapa.output_data_bridge.MinioSource.
 public class SftpSink {
 
     public static final String TO_SFTP_CHANNEL = "toSftpChannel";
+    public static final int SFTP_SESSION_CACHE_SIZE = 10;
 
     @Value("${data-bridge.sinks.sftp.host}")
     private String sftpHost;
@@ -38,14 +42,14 @@ public class SftpSink {
     @Value("${data-bridge.sinks.sftp.base-directory}")
     private String sftpBaseDirectory;
 
-    private DefaultSftpSessionFactory sftpSessionFactory() {
+    private SessionFactory<ChannelSftp.LsEntry> sftpSessionFactory() {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
         factory.setHost(sftpHost);
         factory.setPort(sftpPort);
         factory.setUser(sftpUsername);
         factory.setPassword(sftpPassword);
         factory.setAllowUnknownKeys(true);
-        return factory;
+        return new CachingSessionFactory<>(factory, SFTP_SESSION_CACHE_SIZE);
     }
 
     @Bean
