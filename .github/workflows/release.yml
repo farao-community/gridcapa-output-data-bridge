@@ -32,10 +32,11 @@ jobs:
         run: mvn --batch-mode versions:set -DnewVersion=${{ github.event.inputs.releaseVersion }}
 
       - name: Commit release version
-        run: |
-          git add --all
-          git checkout -b release-v${{ github.event.inputs.releaseVersion }}
-          git commit -m "Prepare release ${{ github.event.inputs.releaseVersion }}"
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: release-v${{ github.event.inputs.releaseVersion }}
+          create_branch: true
+          commit_message: Prepare release ${{ github.event.inputs.releaseVersion }}
 
       - name: Build with Maven
         run: mvn --batch-mode -Pdefault,coverage install
@@ -65,9 +66,10 @@ jobs:
         run: mvn --batch-mode versions:set -DnewVersion=${{ github.event.inputs.nextVersion }}-SNAPSHOT
 
       - name: Commit next version
-        run: |
-          git add --all
-          git commit -m "Prepare next release ${{ github.event.inputs.nextVersion }}"
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: release-v${{ github.event.inputs.releaseVersion }}
+          commit_message: Prepare next release ${{ github.event.inputs.nextVersion }}
 
       - name: Merge automatically
         if: ${{ github.event.inputs.mergeAutomatically }}
