@@ -70,6 +70,11 @@ jobs:
           skip_fetch: true
           skip_checkout: true
 
-      - name: Merge automatically
-        if: ${{ github.event.inputs.mergeAutomatically == 'true' }}
-        run: echo 'Merge automatically cause value is ${{ github.event.inputs.mergeAutomatically }}'
+      - name: Merge automatically into master
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: release-v${{ github.event.inputs.releaseVersion }}
+          target_branch: master
+          message: Automatic merge of release ${{ github.event.inputs.releaseVersion }}
+          github_token: ${{ github.GITHUB_TOKEN }}
