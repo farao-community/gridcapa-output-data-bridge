@@ -71,7 +71,6 @@ jobs:
       - name: Commit next version
         uses: stefanzweifel/git-auto-commit-action@master
         with:
-          branch: release-v${{ github.event.inputs.releaseVersion }}
           commit_message: Prepare next release ${{ github.event.inputs.nextVersion }}
 
       - name: Merge automatically
