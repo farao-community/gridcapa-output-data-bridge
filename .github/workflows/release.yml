@@ -72,6 +72,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@master
         with:
           commit_message: Prepare next release ${{ github.event.inputs.nextVersion }}
+          skip_fetch: true
+          skip_checkout: true
 
       - name: Merge automatically
         if: ${{ github.event.inputs.mergeAutomatically }}
