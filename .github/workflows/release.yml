@@ -32,7 +32,7 @@ jobs:
         run: mvn --batch-mode versions:set -DnewVersion=${{ github.event.inputs.releaseVersion }}
 
       - name: Commit release version
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@master
         with:
           branch: release-v${{ github.event.inputs.releaseVersion }}
           create_branch: true
@@ -69,7 +69,7 @@ jobs:
         run: mvn --batch-mode versions:set -DnewVersion=${{ github.event.inputs.nextVersion }}-SNAPSHOT
 
       - name: Commit next version
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@master
         with:
           branch: release-v${{ github.event.inputs.releaseVersion }}
           commit_message: Prepare next release ${{ github.event.inputs.nextVersion }}
