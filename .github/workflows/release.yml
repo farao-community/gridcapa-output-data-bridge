@@ -9,11 +9,6 @@ on:
       nextVersion:
         description: 'Next version'
         required: true
-      mergeAutomatically:
-        description: 'Merges version commit automatically'
-        required: true
-        type: boolean
-        default: "false"
 
 jobs:
   release:
