@@ -9,30 +9,12 @@ on:
       nextVersion:
         description: 'Next version'
         required: true
-      gpgPrivateKey:
-        description: 'GPG private key for signing artifacts'
-        required: true
-      gpgPassphrase:
-        description: 'GPG passphrase for signing artifacts'
-        required: true
-      nexusUsername:
-        description: 'Nexus username for publishing artifacts'
-        required: true
-      nexusPassword:
-        description: 'Nexus password for publishing artifacts'
-        required: true
 
 jobs:
   release:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-      - name: Masks secrets
-        run: |
-          echo "::add-mask::${{ github.event.inputs.gpgPrivateKey }}" 
-          echo "::add-mask::${{ github.event.inputs.gpgPassphrase }}" 
-          echo "::add-mask::${{ github.event.inputs.nexusUsername }}" 
-          echo "::add-mask::${{ github.event.inputs.nexusPassword }}" 
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -68,10 +50,10 @@ jobs:
       - name: Release Maven package
         uses: samuelmeuli/action-maven-publish@v1
         with:
-          gpg_private_key: ${{ github.event.inputs.gpgPrivateKey }}
-          gpg_passphrase: ${{ github.event.inputs.gpgPassphrase }}
-          nexus_username: ${{ github.event.inputs.nexusUsername }}
-          nexus_password: ${{ github.event.inputs.nexusPassword }}
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          nexus_username: ${{ secrets.NEXUS_USERNAME }}
+          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
           maven_profiles: default release
 
       - name: Build and publish Docker image
