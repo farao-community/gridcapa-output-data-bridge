@@ -48,7 +48,7 @@ jobs:
           tagging_message: v${{ github.event.inputs.releaseVersion }}
           
       - name: Release Maven package
-        uses: samuelmeuli/action-maven-publish@v1.4
+        uses: samuelmeuli/action-maven-publish@v1.4.0
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
