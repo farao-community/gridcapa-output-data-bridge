@@ -76,5 +76,5 @@ jobs:
           skip_checkout: true
 
       - name: Merge automatically
-        if: ${{ github.event.inputs.mergeAutomatically }}
+        if: ${{ github.event.inputs.mergeAutomatically == 'true' }}
         run: echo 'Merge automatically cause value is ${{ github.event.inputs.mergeAutomatically }}'
