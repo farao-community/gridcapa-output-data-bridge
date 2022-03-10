@@ -55,7 +55,9 @@ jobs:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
           maven_profiles: default,release
-          maven_goals_phases: deploy
+
+      - name: Re-build with Maven to avoid multiple .jar achives
+        run: mvn --batch-mode -Pdefault,coverage install
 
       - name: Build and publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@master
