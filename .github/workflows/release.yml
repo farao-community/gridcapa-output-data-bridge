@@ -57,7 +57,7 @@ jobs:
           maven_profiles: default,release
 
       - name: Re-build with Maven to avoid multiple .jar achives
-        run: mvn --batch-mode -Pdefault,coverage install
+        run: mvn --batch-mode -Pdefault,coverage clean install
 
       - name: Build and publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@master
