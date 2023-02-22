@@ -7,6 +7,7 @@
 package com.farao_community.farao.gridcapa.output_data_bridge;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -43,11 +44,13 @@ public class FileTransferFlow {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "data-bridge.sinks.sftp", name = "active", havingValue = "true")
     public IntegrationFlow transferFlowFromMinioToSftp() {
         return generateFileTransferFlow(FROM_MINIO_CHANNEL, TO_SFTP_CHANNEL, fileNameRegex);
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "data-bridge.sinks.ftp", name = "active", havingValue = "true")
     public IntegrationFlow transferFlowFromMinioToFtp() {
         return generateFileTransferFlow(FROM_MINIO_CHANNEL, TO_FTP_CHANNEL, fileNameRegex);
     }
