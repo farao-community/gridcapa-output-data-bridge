@@ -15,8 +15,6 @@ import org.springframework.integration.ftp.session.DefaultFtpSessionFactory;
 import org.springframework.integration.ftp.session.FtpSession;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
  */
