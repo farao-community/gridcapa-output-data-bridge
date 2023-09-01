@@ -43,12 +43,11 @@ public class FtpHealthIndicator implements HealthIndicator {
         ftpSessionFactory.setUsername(ftpUsername);
         ftpSessionFactory.setPassword(ftpPassword);
         ftpSessionFactory.setClientMode(FTPClient.PASSIVE_LOCAL_DATA_CONNECTION_MODE);
-        try {
-            FtpSession session = ftpSessionFactory.getSession();
+        try (FtpSession session = ftpSessionFactory.getSession()){
             if (session.test() && session.exists(ftpBaseDirectory)) {
                 return Health.up().build();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             return Health.down().build();
         }
         return Health.down().build();
