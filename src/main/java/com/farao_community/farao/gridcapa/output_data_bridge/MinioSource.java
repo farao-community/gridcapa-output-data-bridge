@@ -31,7 +31,8 @@ import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.LoggingHandler;
-import org.springframework.integration.metadata.SimpleMetadataStore;
+import org.springframework.integration.metadata.ConcurrentMetadataStore;
+import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
 import org.springframework.integration.transformer.StreamTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
@@ -39,6 +40,7 @@ import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -62,6 +64,8 @@ public class MinioSource {
     private String bucket;
     @Value("${data-bridge.sources.minio.base-directory}")
     private String baseDirectory;
+    @Value("${data-bridge.sources.minio.file-list-persistence-file:/tmp/gridcapa/minio-metadata-store.properties}")
+    private String fileListPersistenceFile;
 
     @Bean
     public PollableChannel minioChannel() {
@@ -88,12 +92,28 @@ public class MinioSource {
                 .build();
     }
 
+    private ConcurrentMetadataStore createMetadataStoreForFilePersistence() {
+        Path persistenceFilePath = Path.of(fileListPersistenceFile);
+        PropertiesPersistingMetadataStore filePersistenceMetadataStore = new PropertiesPersistingMetadataStore();
+        filePersistenceMetadataStore.setBaseDirectory(persistenceFilePath.getParent().toString());
+        filePersistenceMetadataStore.setFileName(persistenceFilePath.getFileName().toString());
+        filePersistenceMetadataStore.afterPropertiesSet();
+        return filePersistenceMetadataStore;
+    }
+
+    private S3PersistentAcceptOnceFileListFilter createFilePersistenceFilter() {
+        ConcurrentMetadataStore metadataStore = createMetadataStoreForFilePersistence();
+        S3PersistentAcceptOnceFileListFilter s3PersistentAcceptOnceFileListFilter = new S3PersistentAcceptOnceFileListFilter(metadataStore, FROM_MINIO_CHANNEL);
+        s3PersistentAcceptOnceFileListFilter.setFlushOnUpdate(true);
+        return s3PersistentAcceptOnceFileListFilter;
+    }
+
     @Bean
     @InboundChannelAdapter(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}"))
     public MessageSource s3InboundStreamingMessageSource() {
         S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
         messageSource.setRemoteDirectory(bucket + "/" + baseDirectory);
-        messageSource.setFilter(new S3PersistentAcceptOnceFileListFilter(new SimpleMetadataStore(), FROM_MINIO_CHANNEL));
+        messageSource.setFilter(createFilePersistenceFilter());
         return messageSource;
     }
 
