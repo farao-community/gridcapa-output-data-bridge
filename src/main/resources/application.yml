@@ -8,6 +8,7 @@ data-bridge:
       bucket: ${SOURCE_MINIO_INPUTS_BUCKET:gridcapa}
       base-directory: ${SOURCE_MINIO_BASE_DIRECTORY:outputs}
       polling-delay-in-ms: 10000
+      file-list-persistence-file: ${SOURCE_MINIO_FILE_LIST_PERSISTENCE_FILE:/tmp/gridcapa/minio-metadata-store.properties}
   sinks:
     ftp:
       active: ${SINK_FTP_ACTIVE:false}
