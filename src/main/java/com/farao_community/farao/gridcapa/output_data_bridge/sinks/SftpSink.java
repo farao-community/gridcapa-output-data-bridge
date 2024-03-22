@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge.sinks;
 
-import com.jcraft.jsch.ChannelSftp;
+import org.apache.sshd.sftp.client.SftpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +42,7 @@ public class SftpSink {
     @Value("${data-bridge.sinks.sftp.base-directory}")
     private String sftpBaseDirectory;
 
-    private SessionFactory<ChannelSftp.LsEntry> sftpSessionFactory() {
+    private SessionFactory<SftpClient.DirEntry> sftpSessionFactory() {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
         factory.setHost(sftpHost);
         factory.setPort(sftpPort);

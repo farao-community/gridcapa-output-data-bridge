@@ -29,7 +29,6 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
@@ -119,7 +118,7 @@ public class MinioSource {
 
     @Bean
     public IntegrationFlow fromMinioFlow() {
-        return IntegrationFlows.from("fromMinioDirectChannel")
+        return IntegrationFlow.from("fromMinioDirectChannel")
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))

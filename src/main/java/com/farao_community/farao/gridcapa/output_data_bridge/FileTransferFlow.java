@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -56,7 +55,7 @@ public class FileTransferFlow {
     }
 
     IntegrationFlow generateFileTransferFlow(String fromChannel, String toChannel, String fileNamePattern) {
-        return IntegrationFlows.from(fromChannel)
+        return IntegrationFlow.from(fromChannel)
                 .filter(Message.class, message -> fileNameMatches(message, fileNamePattern))
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"File \" + headers." + FILE_NAME_HEADER + " + \" matches expected pattern, transferred to FTP\""))
                 .channel(toChannel)
