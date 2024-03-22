@@ -23,6 +23,6 @@ class FileTransferFlowTest {
         IntegrationFlow integrationFlow = fileTransferFlow.transferFlowFromMinioToSftp();
         assertEquals("(?<year>[0-9]{4})(?<month>[0-9]{2})(?<day>[0-9]{2})_(?<hour>[0-9]{2})(?<minute>[0-9]{2})_.*.(uct|UCT)", fileTransferFlow.getFileNameRegex());
         MessageChannelReference messageChannelReference = (MessageChannelReference) integrationFlow.getInputChannel();
-        assertEquals("fromMinioChannel", messageChannelReference.getName());
+        assertEquals("fromMinioChannel", messageChannelReference.name());
     }
 }
