@@ -12,17 +12,10 @@ data-bridge:
     ftp:
       active: true
       host: localhost
-      port: 21
+      port: 9981
       username: gridcapa
       password: gridcapa
       base-directory: /data/gridcapa/cse/d2cc/outputs
-    sftp:
-      active: false
-      host: localhost
-      port: 2222
-      username: gridcapa
-      password: gridcapa
-      base-directory: /data/core/valid/outputs
 
 
 
