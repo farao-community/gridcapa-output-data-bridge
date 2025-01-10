@@ -39,6 +39,7 @@ import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 /**
@@ -109,7 +110,7 @@ public class MinioSource {
 
     @Bean
     @InboundChannelAdapter(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}"))
-    public MessageSource s3InboundStreamingMessageSource() {
+    public MessageSource<InputStream> s3InboundStreamingMessageSource() {
         S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
         messageSource.setRemoteDirectory(bucket + "/" + baseDirectory);
         messageSource.setFilter(createFilePersistenceFilter());
