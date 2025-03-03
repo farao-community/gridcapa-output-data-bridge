@@ -6,14 +6,6 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -37,9 +29,18 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.signer.AwsS3V4Signer;
+import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 /**
@@ -78,17 +79,27 @@ public class MinioSource {
         return new DirectChannel();
     }
 
-    private AmazonS3 amazonS3() {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        clientConfiguration.setSignerOverride(AWS_CLIENT_SIGNER_TYPE);
+    private S3Client amazonS3() throws URISyntaxException {
+        AwsCredentials credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secretKey).build();
+//        ClientConfiguration clientConfiguration = new ClientConfiguration();
+//        clientConfiguration.setSignerOverride(AWS_CLIENT_SIGNER_TYPE);
 
-        return AmazonS3ClientBuilder
+        /*
                 .standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(url, Regions.US_EAST_1.name()))
                 .withPathStyleAccessEnabled(true)
                 .withClientConfiguration(clientConfiguration)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
+         */
+
+        return S3Client.builder()
+//                .standard()
+                .region(Region.US_EAST_1)
+                .endpointOverride(new URI(url))
+                .overrideConfiguration(c -> c.putAdvancedOption(SdkAdvancedClientOption.SIGNER, AwsS3V4Signer.create()))
+                .forcePathStyle(true)
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
                 .build();
     }
 
@@ -110,7 +121,7 @@ public class MinioSource {
 
     @Bean
     @InboundChannelAdapter(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}"))
-    public MessageSource<InputStream> s3InboundStreamingMessageSource() {
+    public MessageSource<InputStream> s3InboundStreamingMessageSource() throws URISyntaxException {
         S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
         messageSource.setRemoteDirectory(bucket + "/" + baseDirectory);
         messageSource.setFilter(createFilePersistenceFilter());
@@ -134,7 +145,7 @@ public class MinioSource {
                 .build();
     }
 
-    private S3RemoteFileTemplate template() {
+    private S3RemoteFileTemplate template() throws URISyntaxException {
         return new S3RemoteFileTemplate(MinioConnectionFix.getSessionFactory(amazonS3()));
     }
 }

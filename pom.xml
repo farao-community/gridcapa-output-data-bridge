@@ -25,7 +25,7 @@
 
     <properties>
         <!-- Dependency versions -->
-        <spring.integration.aws.version>2.4.0</spring.integration.aws.version>
+        <spring.integration.aws.version>3.0.9</spring.integration.aws.version>
         <apache-sshd.version>2.14.0</apache-sshd.version>
         <eddsa.version>0.3.0</eddsa.version>
     </properties>
@@ -64,6 +64,30 @@
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-aws</artifactId>
             <version>${spring.integration.aws.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-s3</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-file</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+            <version>2.30.0</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>checksums</artifactId>
+            <version>2.30.0</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>checksums-spi</artifactId>
+            <version>2.30.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.integration</groupId>
