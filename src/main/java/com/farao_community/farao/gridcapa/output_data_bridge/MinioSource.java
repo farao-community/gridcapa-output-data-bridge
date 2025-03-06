@@ -72,12 +72,6 @@ public class MinioSource {
         return new QueueChannel();
     }
 
-    @Bean
-    @BridgeFrom(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}", maxMessagesPerPoll = "10"))
-    public SubscribableChannel fromMinioDirectChannel() {
-        return new DirectChannel();
-    }
-
     private AmazonS3 amazonS3() {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         ClientConfiguration clientConfiguration = new ClientConfiguration();
@@ -119,7 +113,7 @@ public class MinioSource {
 
     @Bean
     public IntegrationFlow fromMinioFlow() {
-        return IntegrationFlow.from("fromMinioDirectChannel")
+        return IntegrationFlow.from("minioChannel")
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
