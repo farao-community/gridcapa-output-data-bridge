@@ -70,8 +70,6 @@ public class MinioSource {
         return new QueueChannel();
     }
 
-
-
     private S3Client amazonS3() throws URISyntaxException {
         AwsCredentials credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secretKey).build();
 
@@ -111,7 +109,7 @@ public class MinioSource {
 
     @Bean
     public IntegrationFlow fromMinioFlow() {
-        return IntegrationFlow.from("minioChannel")
+        return IntegrationFlow.from(MINIO_CHANNEL)
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
