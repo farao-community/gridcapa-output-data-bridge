@@ -16,6 +16,16 @@ data-bridge:
       username: gridcapa
       password: gridcapa
       base-directory: /data/gridcapa/core/valid/outputs
+  whitelist:
+    - http://minio.test/
+    - http://random.truc
 
+
+minio-adapter:
+  bucket: bucket-for-tests
+  base-path: base/path/for/tests
+  access-key: gridcapa
+  secret-key: gridcapa-secret
+  url: https://minio.test/
 
 

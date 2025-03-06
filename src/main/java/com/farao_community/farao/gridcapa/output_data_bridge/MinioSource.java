@@ -32,15 +32,16 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
-import org.springframework.integration.transformer.StreamTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
+import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -66,6 +67,8 @@ public class MinioSource {
     private String baseDirectory;
     @Value("${data-bridge.sources.minio.file-list-persistence-file:/tmp/gridcapa/minio-metadata-store.properties}")
     private String fileListPersistenceFile;
+    @Value("${data-bridge.whitelist}")
+    private List<String> whitelist;
 
     @Bean
     public PollableChannel minioChannel() {
@@ -118,10 +121,10 @@ public class MinioSource {
     }
 
     @Bean
-    public IntegrationFlow fromMinioFlow() {
+    public IntegrationFlow fromMinioFlow(MinioAdapter minioAdapter) {
         return IntegrationFlow.from("fromMinioDirectChannel")
-                .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
+                .transform(new CustomStreamTransformer(minioAdapter, whitelist))
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
                 .channel(FROM_MINIO_CHANNEL)
                 .get();
