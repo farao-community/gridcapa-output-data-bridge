@@ -110,7 +110,7 @@ public class MinioSource {
 
     @Bean
     public IntegrationFlow fromMinioFlow() {
-        return IntegrationFlow.from("minioChannel")
+        return IntegrationFlow.from(MINIO_CHANNEL)
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
