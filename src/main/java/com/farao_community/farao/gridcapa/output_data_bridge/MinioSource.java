@@ -11,13 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.integration.annotation.BridgeFrom;
 import org.springframework.integration.annotation.InboundChannelAdapter;
 import org.springframework.integration.annotation.Poller;
 import org.springframework.integration.aws.inbound.S3StreamingMessageSource;
 import org.springframework.integration.aws.support.S3RemoteFileTemplate;
 import org.springframework.integration.aws.support.filters.S3PersistentAcceptOnceFileListFilter;
-import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -27,7 +25,6 @@ import org.springframework.integration.metadata.PropertiesPersistingMetadataStor
 import org.springframework.integration.transformer.StreamTransformer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
-import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
@@ -73,28 +70,12 @@ public class MinioSource {
         return new QueueChannel();
     }
 
-    @Bean
-    @BridgeFrom(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}", maxMessagesPerPoll = "10"))
-    public SubscribableChannel fromMinioDirectChannel() {
-        return new DirectChannel();
-    }
+
 
     private S3Client amazonS3() throws URISyntaxException {
         AwsCredentials credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secretKey).build();
-//        ClientConfiguration clientConfiguration = new ClientConfiguration();
-//        clientConfiguration.setSignerOverride(AWS_CLIENT_SIGNER_TYPE);
-
-        /*
-                .standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(url, Regions.US_EAST_1.name()))
-                .withPathStyleAccessEnabled(true)
-                .withClientConfiguration(clientConfiguration)
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-                .build();
-         */
 
         return S3Client.builder()
-//                .standard()
                 .region(Region.US_EAST_1)
                 .endpointOverride(new URI(url))
                 .overrideConfiguration(c -> c.putAdvancedOption(SdkAdvancedClientOption.SIGNER, AwsS3V4Signer.create()))
@@ -130,7 +111,7 @@ public class MinioSource {
 
     @Bean
     public IntegrationFlow fromMinioFlow() {
-        return IntegrationFlow.from("fromMinioDirectChannel")
+        return IntegrationFlow.from("minioChannel")
                 .transform(new StreamTransformer())
                 .transform(Message.class, this::addFileNameHeader)
                 .log(LoggingHandler.Level.INFO, PARSER.parseExpression("\"Integration of file \" + headers." + FILE_NAME_HEADER))
