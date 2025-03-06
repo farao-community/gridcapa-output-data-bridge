@@ -6,8 +6,9 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge.health;
 
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeSinkFtpSftpConfiguration;
 import org.apache.commons.net.ftp.FTPClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,27 +23,22 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "data-bridge.sinks.ftp", name = "active", havingValue = "true")
 public class FtpHealthIndicator implements HealthIndicator {
 
-    @Value("${data-bridge.sinks.ftp.host}")
-    private String ftpHost;
-    @Value("${data-bridge.sinks.ftp.port}")
-    private int ftpPort;
-    @Value("${data-bridge.sinks.ftp.username}")
-    private String ftpUsername;
-    @Value("${data-bridge.sinks.ftp.password}")
-    private String ftpPassword;
-    @Value("${data-bridge.sinks.ftp.base-directory}")
-    private String ftpBaseDirectory;
+    private final OutputDataBridgeSinkFtpSftpConfiguration ftpConfiguration;
+
+    public FtpHealthIndicator(final OutputDataBridgeConfiguration configuration) {
+        this.ftpConfiguration = configuration.sinks().ftp();
+    }
 
     @Override
     public Health health() {
         DefaultFtpSessionFactory ftpSessionFactory = new DefaultFtpSessionFactory();
-        ftpSessionFactory.setHost(ftpHost);
-        ftpSessionFactory.setPort(ftpPort);
-        ftpSessionFactory.setUsername(ftpUsername);
-        ftpSessionFactory.setPassword(ftpPassword);
+        ftpSessionFactory.setHost(ftpConfiguration.host());
+        ftpSessionFactory.setPort(ftpConfiguration.port());
+        ftpSessionFactory.setUsername(ftpConfiguration.username());
+        ftpSessionFactory.setPassword(ftpConfiguration.password());
         ftpSessionFactory.setClientMode(FTPClient.PASSIVE_LOCAL_DATA_CONNECTION_MODE);
         try (FtpSession session = ftpSessionFactory.getSession()) {
-            if (session.test() && session.exists(ftpBaseDirectory)) {
+            if (session.test() && session.exists(ftpConfiguration.baseDirectory())) {
                 return Health.up().build();
             }
         } catch (Exception e) {

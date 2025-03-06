@@ -6,8 +6,9 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge.sinks;
 
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeSinkFtpSftpConfiguration;
 import org.apache.sshd.sftp.client.SftpClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,23 +32,18 @@ public class SftpSink {
     public static final String TO_SFTP_CHANNEL = "toSftpChannel";
     public static final int SFTP_SESSION_CACHE_SIZE = 10;
 
-    @Value("${data-bridge.sinks.sftp.host}")
-    private String sftpHost;
-    @Value("${data-bridge.sinks.sftp.port}")
-    private int sftpPort;
-    @Value("${data-bridge.sinks.sftp.username}")
-    private String sftpUsername;
-    @Value("${data-bridge.sinks.sftp.password}")
-    private String sftpPassword;
-    @Value("${data-bridge.sinks.sftp.base-directory}")
-    private String sftpBaseDirectory;
+    private final OutputDataBridgeSinkFtpSftpConfiguration sftpConfiguration;
+
+    public SftpSink(final OutputDataBridgeConfiguration configuration) {
+        this.sftpConfiguration = configuration.sinks().sftp();
+    }
 
     private SessionFactory<SftpClient.DirEntry> sftpSessionFactory() {
         DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
-        factory.setHost(sftpHost);
-        factory.setPort(sftpPort);
-        factory.setUser(sftpUsername);
-        factory.setPassword(sftpPassword);
+        factory.setHost(sftpConfiguration.host());
+        factory.setPort(sftpConfiguration.port());
+        factory.setUser(sftpConfiguration.username());
+        factory.setPassword(sftpConfiguration.password());
         factory.setAllowUnknownKeys(true);
         return new CachingSessionFactory<>(factory, SFTP_SESSION_CACHE_SIZE);
     }
@@ -56,7 +52,7 @@ public class SftpSink {
     @ServiceActivator(inputChannel = TO_SFTP_CHANNEL)
     public MessageHandler handler() {
         SftpMessageHandler handler = new SftpMessageHandler(sftpSessionFactory());
-        handler.setRemoteDirectoryExpression(new LiteralExpression(sftpBaseDirectory));
+        handler.setRemoteDirectoryExpression(new LiteralExpression(sftpConfiguration.baseDirectory()));
         handler.setFileNameGenerator(message -> (String) message.getHeaders().get(FILE_NAME_HEADER));
         return handler;
     }

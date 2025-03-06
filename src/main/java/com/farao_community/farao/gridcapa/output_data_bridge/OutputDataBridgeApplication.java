@@ -6,14 +6,17 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge;
 
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @SuppressWarnings("hideutilityclassconstructor")
 @SpringBootApplication
+@EnableConfigurationProperties(OutputDataBridgeConfiguration.class)
 public class OutputDataBridgeApplication {
     public static void main(String[] args) {
         SpringApplication.run(OutputDataBridgeApplication.class, args);

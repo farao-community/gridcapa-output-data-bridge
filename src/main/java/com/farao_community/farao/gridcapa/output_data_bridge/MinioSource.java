@@ -14,8 +14,10 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeSourceMinioConfiguration;
+import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -36,7 +38,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.MessageBuilder;
-import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 
 import java.io.File;
 import java.io.InputStream;
@@ -55,20 +56,13 @@ public class MinioSource {
 
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
-    @Value("${data-bridge.sources.minio.url}")
-    private String url;
-    @Value("${data-bridge.sources.minio.access-key}")
-    private String accessKey;
-    @Value("${data-bridge.sources.minio.secret-key}")
-    private String secretKey;
-    @Value("${data-bridge.sources.minio.bucket}")
-    private String bucket;
-    @Value("${data-bridge.sources.minio.base-directory}")
-    private String baseDirectory;
-    @Value("${data-bridge.sources.minio.file-list-persistence-file:/tmp/gridcapa/minio-metadata-store.properties}")
-    private String fileListPersistenceFile;
-    @Value("${data-bridge.whitelist}")
-    private List<String> whitelist;
+    private final OutputDataBridgeSourceMinioConfiguration configuration;
+    private final List<String> whitelist;
+
+    public MinioSource(final OutputDataBridgeConfiguration configuration) {
+        this.configuration = configuration.sources().minio();
+        this.whitelist = configuration.whitelist();
+    }
 
     @Bean
     public PollableChannel minioChannel() {
@@ -82,13 +76,13 @@ public class MinioSource {
     }
 
     private AmazonS3 amazonS3() {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AWSCredentials credentials = new BasicAWSCredentials(configuration.accessKey(), configuration.secretKey());
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         clientConfiguration.setSignerOverride(AWS_CLIENT_SIGNER_TYPE);
 
         return AmazonS3ClientBuilder
                 .standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(url, Regions.US_EAST_1.name()))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(configuration.url(), Regions.US_EAST_1.name()))
                 .withPathStyleAccessEnabled(true)
                 .withClientConfiguration(clientConfiguration)
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -96,7 +90,7 @@ public class MinioSource {
     }
 
     private ConcurrentMetadataStore createMetadataStoreForFilePersistence() {
-        Path persistenceFilePath = Path.of(fileListPersistenceFile);
+        Path persistenceFilePath = Path.of(configuration.fileListPersistenceFile());
         PropertiesPersistingMetadataStore filePersistenceMetadataStore = new PropertiesPersistingMetadataStore();
         filePersistenceMetadataStore.setBaseDirectory(persistenceFilePath.getParent().toString());
         filePersistenceMetadataStore.setFileName(persistenceFilePath.getFileName().toString());
@@ -115,7 +109,7 @@ public class MinioSource {
     @InboundChannelAdapter(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}"))
     public MessageSource<InputStream> s3InboundStreamingMessageSource() {
         S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
-        messageSource.setRemoteDirectory(bucket + "/" + baseDirectory);
+        messageSource.setRemoteDirectory(configuration.bucket() + "/" + configuration.baseDirectory());
         messageSource.setFilter(createFilePersistenceFilter());
         return messageSource;
     }

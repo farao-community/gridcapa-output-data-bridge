@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -29,8 +29,11 @@ import static com.farao_community.farao.gridcapa.output_data_bridge.sinks.SftpSi
 public class FileTransferFlow {
     private static final SpelExpressionParser PARSER = new SpelExpressionParser();
 
-    @Value("${data-bridge.file-regex}")
-    private String fileNameRegex;
+    private final String fileNameRegex;
+
+    public FileTransferFlow(final OutputDataBridgeConfiguration configuration) {
+        this.fileNameRegex = configuration.fileRegex();
+    }
 
     @Bean
     public MessageChannel toSftpChannel() {

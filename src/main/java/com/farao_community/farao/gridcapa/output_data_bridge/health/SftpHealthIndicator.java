@@ -6,7 +6,8 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge.health;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeConfiguration;
+import com.farao_community.farao.gridcapa.output_data_bridge.configuration.OutputDataBridgeSinkFtpSftpConfiguration;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,27 +22,22 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "data-bridge.sinks.sftp", name = "active", havingValue = "true")
 public class SftpHealthIndicator implements HealthIndicator {
 
-    @Value("${data-bridge.sinks.sftp.host}")
-    private String sftpHost;
-    @Value("${data-bridge.sinks.sftp.port}")
-    private int sftpPort;
-    @Value("${data-bridge.sinks.sftp.username}")
-    private String sftpUsername;
-    @Value("${data-bridge.sinks.sftp.password}")
-    private String sftpPassword;
-    @Value("${data-bridge.sinks.sftp.base-directory}")
-    private String sftpBaseDirectory;
+    private final OutputDataBridgeSinkFtpSftpConfiguration sftpConfiguration;
+
+    public SftpHealthIndicator(final OutputDataBridgeConfiguration configuration) {
+        this.sftpConfiguration = configuration.sinks().sftp();
+    }
 
     @Override
     public Health health() {
         DefaultSftpSessionFactory sftpSessionFactory = new DefaultSftpSessionFactory();
-        sftpSessionFactory.setHost(sftpHost);
-        sftpSessionFactory.setPort(sftpPort);
-        sftpSessionFactory.setUser(sftpUsername);
-        sftpSessionFactory.setPassword(sftpPassword);
+        sftpSessionFactory.setHost(sftpConfiguration.host());
+        sftpSessionFactory.setPort(sftpConfiguration.port());
+        sftpSessionFactory.setUser(sftpConfiguration.username());
+        sftpSessionFactory.setPassword(sftpConfiguration.password());
         sftpSessionFactory.setAllowUnknownKeys(true);
         try (SftpSession session = sftpSessionFactory.getSession()) {
-            if (session.test() && session.exists(sftpBaseDirectory)) {
+            if (session.test() && session.exists(sftpConfiguration.baseDirectory())) {
                 return Health.up().build();
             }
         } catch (Exception e) {
