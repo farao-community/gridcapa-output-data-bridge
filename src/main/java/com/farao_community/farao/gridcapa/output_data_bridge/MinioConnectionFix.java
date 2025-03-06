@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.gridcapa.output_data_bridge;
 
-import com.amazonaws.services.s3.AmazonS3;
 import org.springframework.integration.aws.support.S3Session;
 import org.springframework.integration.aws.support.S3SessionFactory;
 import org.springframework.util.Assert;
+import software.amazon.awssdk.services.s3.S3Client;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -19,7 +19,7 @@ final class MinioConnectionFix {
         throw new AssertionError("Utility class should not be instantiated.");
     }
 
-    public static S3SessionFactory getSessionFactory(AmazonS3 amazonS3) {
+    public static S3SessionFactory getSessionFactory(S3Client amazonS3) {
         return new MinioFixedS3SessionFactory(amazonS3);
     }
 }
@@ -33,7 +33,7 @@ class MinioFixedS3SessionFactory extends S3SessionFactory {
         return s3Session;
     }
 
-    public MinioFixedS3SessionFactory(AmazonS3 amazonS3) {
+    public MinioFixedS3SessionFactory(S3Client amazonS3) {
         super(amazonS3);
         Assert.notNull(amazonS3, "'amazonS3' must not be null.");
         this.s3Session = new MinioFixedS3Session(amazonS3);
@@ -42,7 +42,7 @@ class MinioFixedS3SessionFactory extends S3SessionFactory {
 
 class MinioFixedS3Session extends S3Session {
 
-    public MinioFixedS3Session(AmazonS3 amazonS3) {
+    public MinioFixedS3Session(S3Client amazonS3) {
         super(amazonS3);
     }
 
