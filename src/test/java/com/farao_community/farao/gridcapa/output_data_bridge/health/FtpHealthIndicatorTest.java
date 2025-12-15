@@ -13,10 +13,10 @@ import static org.springframework.boot.actuate.health.Status.DOWN;
 class FtpHealthIndicatorTest {
 
     @Autowired
-    private FtpHealthIndicator ftpHealthIndicator;
+    private FtpHealthIndicator healthIndicator;
 
     @Test
     void healthDownBecauseNoSession() {
-        assertSame(DOWN, ftpHealthIndicator.health().getStatus());
+        assertSame(DOWN, healthIndicator.health().getStatus());
     }
 }

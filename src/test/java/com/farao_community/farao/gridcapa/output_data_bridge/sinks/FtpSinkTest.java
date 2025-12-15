@@ -1,10 +1,11 @@
 package com.farao_community.farao.gridcapa.output_data_bridge.sinks;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("ftp")
@@ -15,6 +16,6 @@ class FtpSinkTest {
 
     @Test
     void handlerIsNotNull() {
-        Assertions.assertNotNull(sink.handler());
+        assertNotNull(sink.handler());
     }
 }
