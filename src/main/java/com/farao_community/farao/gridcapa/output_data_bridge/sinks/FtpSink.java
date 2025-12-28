@@ -50,7 +50,7 @@ public class FtpSink {
     @Bean
     @ServiceActivator(inputChannel = TO_FTP_CHANNEL)
     public MessageHandler handler() {
-        FtpMessageHandler handler = new FtpMessageHandler(ftpSessionFactory());
+        final FtpMessageHandler handler = new FtpMessageHandler(ftpSessionFactory());
         handler.setAutoCreateDirectory(true);
         handler.setRemoteDirectoryExpression(new LiteralExpression(ftpBaseDirectory));
         handler.setFileNameGenerator(message -> (String) message.getHeaders().get(FILE_NAME_HEADER));

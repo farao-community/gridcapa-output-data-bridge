@@ -71,7 +71,7 @@ public class MinioSource {
     }
 
     private S3Client amazonS3() throws URISyntaxException {
-        AwsCredentials credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secretKey).build();
+        final AwsCredentials credentials = AwsBasicCredentials.builder().accessKeyId(accessKey).secretAccessKey(secretKey).build();
 
         return S3Client.builder()
                 .region(Region.US_EAST_1)
@@ -83,8 +83,8 @@ public class MinioSource {
     }
 
     private ConcurrentMetadataStore createMetadataStoreForFilePersistence() {
-        Path persistenceFilePath = Path.of(fileListPersistenceFile);
-        PropertiesPersistingMetadataStore filePersistenceMetadataStore = new PropertiesPersistingMetadataStore();
+        final Path persistenceFilePath = Path.of(fileListPersistenceFile);
+        final PropertiesPersistingMetadataStore filePersistenceMetadataStore = new PropertiesPersistingMetadataStore();
         filePersistenceMetadataStore.setBaseDirectory(persistenceFilePath.getParent().toString());
         filePersistenceMetadataStore.setFileName(persistenceFilePath.getFileName().toString());
         filePersistenceMetadataStore.afterPropertiesSet();
@@ -92,7 +92,7 @@ public class MinioSource {
     }
 
     private S3PersistentAcceptOnceFileListFilter createFilePersistenceFilter() {
-        ConcurrentMetadataStore metadataStore = createMetadataStoreForFilePersistence();
+        final ConcurrentMetadataStore metadataStore = createMetadataStoreForFilePersistence();
         S3PersistentAcceptOnceFileListFilter s3PersistentAcceptOnceFileListFilter = new S3PersistentAcceptOnceFileListFilter(metadataStore, FROM_MINIO_CHANNEL);
         s3PersistentAcceptOnceFileListFilter.setFlushOnUpdate(true);
         return s3PersistentAcceptOnceFileListFilter;
@@ -101,7 +101,7 @@ public class MinioSource {
     @Bean
     @InboundChannelAdapter(value = MINIO_CHANNEL, poller = @Poller(fixedDelay = "${data-bridge.sources.minio.polling-delay-in-ms}"))
     public MessageSource<InputStream> s3InboundStreamingMessageSource() throws URISyntaxException {
-        S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
+        final S3StreamingMessageSource messageSource = new S3StreamingMessageSource(template());
         messageSource.setRemoteDirectory(bucket + "/" + baseDirectory);
         messageSource.setFilter(createFilePersistenceFilter());
         return messageSource;
