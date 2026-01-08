@@ -43,7 +43,7 @@ public class SftpSink {
     private String sftpBaseDirectory;
 
     private SessionFactory<SftpClient.DirEntry> sftpSessionFactory() {
-        DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
+        final DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory();
         factory.setHost(sftpHost);
         factory.setPort(sftpPort);
         factory.setUser(sftpUsername);
@@ -55,7 +55,7 @@ public class SftpSink {
     @Bean
     @ServiceActivator(inputChannel = TO_SFTP_CHANNEL)
     public MessageHandler handler() {
-        SftpMessageHandler handler = new SftpMessageHandler(sftpSessionFactory());
+        final SftpMessageHandler handler = new SftpMessageHandler(sftpSessionFactory());
         handler.setRemoteDirectoryExpression(new LiteralExpression(sftpBaseDirectory));
         handler.setFileNameGenerator(message -> (String) message.getHeaders().get(FILE_NAME_HEADER));
         return handler;

@@ -35,17 +35,17 @@ public class FtpHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        DefaultFtpSessionFactory ftpSessionFactory = new DefaultFtpSessionFactory();
+        final DefaultFtpSessionFactory ftpSessionFactory = new DefaultFtpSessionFactory();
         ftpSessionFactory.setHost(ftpHost);
         ftpSessionFactory.setPort(ftpPort);
         ftpSessionFactory.setUsername(ftpUsername);
         ftpSessionFactory.setPassword(ftpPassword);
         ftpSessionFactory.setClientMode(FTPClient.PASSIVE_LOCAL_DATA_CONNECTION_MODE);
-        try (FtpSession session = ftpSessionFactory.getSession()) {
+        try (final FtpSession session = ftpSessionFactory.getSession()) {
             if (session.test() && session.exists(ftpBaseDirectory)) {
                 return Health.up().build();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return Health.down().build();
         }
         return Health.down().build();

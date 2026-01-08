@@ -34,13 +34,13 @@ public class SftpHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        DefaultSftpSessionFactory sftpSessionFactory = new DefaultSftpSessionFactory();
+        final DefaultSftpSessionFactory sftpSessionFactory = new DefaultSftpSessionFactory();
         sftpSessionFactory.setHost(sftpHost);
         sftpSessionFactory.setPort(sftpPort);
         sftpSessionFactory.setUser(sftpUsername);
         sftpSessionFactory.setPassword(sftpPassword);
         sftpSessionFactory.setAllowUnknownKeys(true);
-        try (SftpSession session = sftpSessionFactory.getSession()) {
+        try (final SftpSession session = sftpSessionFactory.getSession()) {
             if (session.test() && session.exists(sftpBaseDirectory)) {
                 return Health.up().build();
             }
